@@ -2,13 +2,13 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/Umesh-Tiruvalluru/BookBnb/internal/models"
 	"github.com/google/uuid"
 )
-
-
 
 func (repo *Repository) GetBookings(userID uuid.UUID) ([]models.Booking, error) {
 	query := `
@@ -110,19 +110,21 @@ func (repo *Repository) GetBookingByID(id uuid.UUID) (models.GetBooking, error) 
 
 func (repo *Repository) CancelBooking(id uuid.UUID, userID uuid.UUID) (string, error) {
 	query := `
-		UPDATE bookings 
-		SET status = 'cancelled'
-		WHERE user_id = $1 AND id = $2
-		RETURNING status;
-	`
+        UPDATE bookings
+        SET status = 'cancelled'
+        WHERE id = $1 AND user_id = $2
+        RETURNING status;
+    `
 
 	var status string
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	err := repo.db.QueryRowContext(ctx, query, userID, id).Scan(&status)
-
+	err := repo.db.QueryRowContext(ctx, query, id, userID).Scan(&status)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", sql.ErrNoRows
+		}
 		return "", err
 	}
 

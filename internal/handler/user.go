@@ -2,10 +2,12 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/Umesh-Tiruvalluru/BookBnb/internal/helper"
 	"github.com/Umesh-Tiruvalluru/BookBnb/internal/models"
+	"github.com/google/uuid"
 )
 
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
@@ -31,7 +33,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 
 	user := models.RegisterUser{
 		FirstName:    req.FirstName,
-		SecondName:   req.SecondName,
+		LastName:   req.LastName,
 		Email:        req.Email,
 		PasswordHash: pwHash,
 	}
@@ -81,7 +83,38 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error occurred while creating token", http.StatusInternalServerError)
 	}
 
-	if err := helper.WriteJSON(w, token, http.StatusCreated); err != nil {
+	if err := helper.WriteJSON(w, map[string]any{"token": token}, http.StatusCreated); err != nil {
+		h.cfg.Logger.Error("Failed to generate a response", "Error", err)
+		http.Error(w, "Failed to generate a response", http.StatusInternalServerError)
+	}
+
+}
+
+func (h *Handler) Me (w http.ResponseWriter, r *http.Request) {
+	userVal := r.Context().Value("userID")
+	if userVal == nil {
+		h.cfg.Logger.Error("Failed to generate a response", "Error", "User is not in the context")
+		http.Error(w, "User is not in the context", http.StatusUnauthorized)
+		return
+	}
+
+	userID, ok := userVal.(string)
+	if !ok {
+		h.cfg.Logger.Error("Invalid type", "Error", "Invalid user id type")
+		http.Error(w, "Invalid user id type in context", http.StatusInternalServerError)
+		return
+	}
+
+	userDetails, err := h.repo.UserDetails(uuid.MustParse(userID))
+	if err != nil {
+		h.cfg.Logger.Error("Unable to get user details", "Error", err)
+		http.Error(w, fmt.Sprintf("Error:%v", err), http.StatusConflict)
+		return
+	}
+
+
+
+	if err := helper.WriteJSON(w, map[string]any {"user": userDetails}, http.StatusCreated); err != nil {
 		h.cfg.Logger.Error("Failed to generate a response", "Error", err)
 		http.Error(w, "Failed to generate a response", http.StatusInternalServerError)
 	}

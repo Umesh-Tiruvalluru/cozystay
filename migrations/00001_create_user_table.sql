@@ -1,5 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
+
 CREATE TABLE IF NOT EXISTS users (
     id            UUID PRIMARY KEY DEFAULT GEN_RANDOM_UUID(),
     email         TEXT NOT NULL UNIQUE,
@@ -15,5 +16,4 @@ CREATE TABLE IF NOT EXISTS users (
 -- +goose Down
 -- +goose StatementBegin
 DROP TABLE IF EXISTS users;
--- +goose StatementEnd      
-
+-- +goose StatementEnd

@@ -61,8 +61,6 @@ func (h *Handler) CreateBooking(w http.ResponseWriter, r *http.Request) {
 
 	userID := uuid.MustParse(userVal.(string))
 
-	fmt.Println(userID)
-
 	var req struct {
 		PropertyID uuid.UUID `json:"property_id"`
 		StartDate  string    `json:"start_date"`
@@ -119,10 +117,9 @@ func (h *Handler) CancelBooking(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := helper.WriteJSON(w,res, http.StatusNoContent); err != nil {
+	if err := helper.WriteJSON(w, res, http.StatusOK); err != nil {
 		h.cfg.Logger.Error("Failed to generate a response", "Error", err)
 		http.Error(w, "Failed to generate a response", http.StatusInternalServerError)
 	}
-
 
 }

@@ -1,0 +1,49 @@
+services:
+  # client:
+  #   container_name: cozystay-client
+  #   build: ./frontend
+  #   ports:
+  #     - 3000:3000
+  api:
+    container_name: cozystay-api
+    build: .
+    ports:
+      - 4000:4000
+    env_file: ./.env
+    depends_on:
+      database:
+        condition: service_healthy
+  database:
+    container_name: cozystay-db
+    image: postgres:18.0-bookworm
+    volumes:
+      - pgdata:/var/lib/postgresql/18/data
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    healthcheck:
+      test: [CMD-SHELL, "sh -c 'pg_isready -U ${DB_USER} -d ${DB_NAME}'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    ports:
+      - 5432:5432
+  migrations:
+    image: kukymbr/goose-docker:3.24.2
+    restart: no
+    volumes:
+      - ./migrations:/migrations
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - GOOSE_DRIVER=postgres
+      - GOOSE_DBSTRING=host=cozystay-db port=5432 user=${DB_USER} password=${DB_PASSWORD} dbname=${DB_NAME} sslmode=disable
+      - GOOSE_VERBOSE=true
+    command: ["goose", "-dir", "/migrations", "up"]
+
+volumes:
+  pgdata:
+  migrations:

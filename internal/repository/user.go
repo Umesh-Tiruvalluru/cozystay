@@ -35,7 +35,7 @@ func (repo *Repository) RegisterUser(user *models.RegisterUser) (uuid.UUID, erro
 		RETURNING id;
 	`
 	//TODO Separate each users
-	if user.FirstName == "" || user.SecondName == "" || user.Email == "" || user.PasswordHash == "" {
+	if user.FirstName == "" || user.LastName == "" || user.Email == "" || user.PasswordHash == "" {
 		return uuid.Nil, errors.New("all fields are required (first Name, last Name, email, password)")
 	}
 
@@ -52,7 +52,7 @@ func (repo *Repository) RegisterUser(user *models.RegisterUser) (uuid.UUID, erro
 		return  uuid.Nil, errors.New("user already exists")
 	}
 
-	err = repo.db.QueryRowContext(ctx, query, user.FirstName, user.SecondName, user.Email, user.PasswordHash).Scan(&id)
+	err = repo.db.QueryRowContext(ctx, query, user.FirstName, user.LastName, user.Email, user.PasswordHash).Scan(&id)
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -66,6 +66,29 @@ func (repo *Repository) LoginUser(email string) (models.LoginUser, error) {
 	user, err = repo.GetUserByEmail(email)
 	if err != nil {
 		return user, err
+	}
+
+	return user, nil
+}
+
+
+
+func (repo *Repository) UserDetails (id uuid.UUID) (models.UserDetails, error) {
+	query := `
+		SELECT id, first_name, last_name, email, role
+		FROM users 
+		WHERE id = $1;
+	`
+
+	var user models.UserDetails
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3 * time.Second)
+	defer cancel()
+
+	err := repo.db.QueryRowContext(ctx, query, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Role)
+
+	if err != nil {
+		return  user, err
 	}
 
 	return user, nil

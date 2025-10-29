@@ -3,13 +3,15 @@ package main
 import (
 	"context"
 	"database/sql"
-	"flag"
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/Umesh-Tiruvalluru/BookBnb/internal/config"
 	"github.com/Umesh-Tiruvalluru/BookBnb/internal/logger"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -19,12 +21,36 @@ var (
 )
 
 func main() {
-	var err error
-
-	loadFlags()
-
 	cfg.Logger = logger.NewAppLogger(cfg.Env)
+	
+	err := godotenv.Load()
+	if err != nil {
+		cfg.Logger.Fatal("Failed to load environmental variables", "error", err)
+	}
 
+	cfg.Port = os.Getenv("PORT")
+	cfg.Env = os.Getenv("ENV")
+
+	dbHost := os.Getenv("DB_HOST")  
+	dbPort := os.Getenv("DB_PORT")  
+	dbUser := os.Getenv("DB_USER")  
+	dbPassword := os.Getenv("DB_PASSWORD")  
+	dbName := os.Getenv("DB_NAME")  
+
+	cfg.DB.Dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+    dbHost, dbPort, dbUser, dbPassword, dbName)
+
+	maxIdleConns, err := strconv.Atoi(os.Getenv("MAX_IDLE_CONNS"))
+	if err != nil {
+		cfg.Logger.Error("Error converting string to int", "Error", err)
+	}
+	cfg.DB.MaxIdleConns = maxIdleConns
+	cfg.DB.MaxIdleTime = os.Getenv("MAX_IDLE_TIME")
+	maxOpenConns, err := strconv.Atoi(os.Getenv("MAX_OPEN_CONNS"))
+	if err != nil {
+		cfg.Logger.Error("Error converting string to int", "Error", err)
+	}
+	cfg.DB.MaxOpenConns =  maxOpenConns
 
 	db, err = ConnectDB()
 	if err != nil {
@@ -47,25 +73,6 @@ func main() {
 	if err := srv.ListenAndServe(); err != nil {
 		cfg.Logger.Fatal("Server failed to start", "error", err)
 	}
-}
-
-func loadFlags() {
-	flag.StringVar(&cfg.Port, "port", "4000", "API Server Port")
-	flag.StringVar(&cfg.Env, "env", "development",
-		"Environment (Production | Staging | Production)")
-
-	flag.StringVar(&cfg.DB.Dsn, "db-dsn",
-		"postgres://postgres:3011@localhost:5432/bookings?sslmode=disable", "PostgreSQL DSN")
-
-	flag.IntVar(&cfg.DB.MaxOpenConns, "db-max-open-conns", 25,
-		"PostgreSQL max open connections")
-	flag.IntVar(&cfg.DB.MaxIdleConns, "db-max-idle-conns", 25,
-		"PostgreSQL max open idle connections")
-	flag.StringVar(&cfg.DB.MaxIdleTime, "db-max-idle-time", "15m",
-		"PostgreSQL max connection idle time")
-
-
-	flag.Parse()
 }
 
 func ConnectDB() (*sql.DB, error) {
