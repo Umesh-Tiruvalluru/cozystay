@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"os"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -28,14 +29,13 @@ func HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
 
-
 func CreateToken(id uuid.UUID, role string) (string, error) {
+	jwtSecret := os.Getenv("JWT_SECRET")
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"id":   id,
@@ -43,7 +43,7 @@ func CreateToken(id uuid.UUID, role string) (string, error) {
 		},
 	)
 
-	tokenString, err := token.SignedString([]byte("simba"))
+	tokenString, err := token.SignedString([]byte(jwtSecret))
 	if err != nil {
 		return "", err
 	}
