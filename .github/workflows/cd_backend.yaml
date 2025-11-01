@@ -21,4 +21,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/Umesh-Tiruvalluru/cozystay-api:${{ github.sha }}
+          tags: ghcr.io/umesh-tiruvalluru/cozystay-api:${{ github.sha }}
