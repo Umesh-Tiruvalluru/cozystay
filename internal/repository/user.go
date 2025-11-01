@@ -9,10 +9,9 @@ import (
 	"github.com/google/uuid"
 )
 
-
 func (repo *Repository) GetUserByEmail(email string) (models.LoginUser, error) {
 	query := `
-		SELECT id, email, password_hash, role 
+		SELECT id, email, password_hash, role
 		FROM users WHERE email = $1;
 	`
 	var user models.LoginUser
@@ -45,11 +44,11 @@ func (repo *Repository) RegisterUser(user *models.RegisterUser) (uuid.UUID, erro
 
 	exisitingUser, err := repo.GetUserByEmail(user.Email)
 	if err == nil {
-		return  uuid.Nil, err
+		return uuid.Nil, err
 	}
 
 	if exisitingUser.Email != "" {
-		return  uuid.Nil, errors.New("user already exists")
+		return uuid.Nil, errors.New("user already exists")
 	}
 
 	err = repo.db.QueryRowContext(ctx, query, user.FirstName, user.LastName, user.Email, user.PasswordHash).Scan(&id)
@@ -71,24 +70,22 @@ func (repo *Repository) LoginUser(email string) (models.LoginUser, error) {
 	return user, nil
 }
 
-
-
-func (repo *Repository) UserDetails (id uuid.UUID) (models.UserDetails, error) {
+func (repo *Repository) UserDetails(id uuid.UUID) (models.UserDetails, error) {
 	query := `
 		SELECT id, first_name, last_name, email, role
-		FROM users 
+		FROM users
 		WHERE id = $1;
 	`
 
 	var user models.UserDetails
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	err := repo.db.QueryRowContext(ctx, query, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Role)
 
 	if err != nil {
-		return  user, err
+		return user, err
 	}
 
 	return user, nil

@@ -16,7 +16,7 @@ func RoleMiddleware(next http.Handler) http.Handler {
 
 		if authHeader == "" {
 			http.Error(w, "Missing authorization header", http.StatusUnauthorized)
-			return 
+			return
 		}
 
 		parts := strings.SplitN(authHeader, " ", 2)
@@ -25,10 +25,10 @@ func RoleMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		token, err := helper.VerifyToken(parts[1])
+		token, err := helper.VerifyToken(parts[1], cfg.JwtSecret)
 		if err != nil {
 			http.Error(w, "Invalid token", http.StatusUnauthorized)
-			return 
+			return
 		}
 
 		ctx := context.WithValue(r.Context(), "role", token["role"])
@@ -52,7 +52,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		token, err := helper.VerifyToken(parts[1])
+		token, err := helper.VerifyToken(parts[1], cfg.JwtSecret)
 		if err != nil {
 			http.Error(w, "Invalid Authorization", http.StatusUnauthorized)
 			return
@@ -64,34 +64,33 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-
 func LoggingMiddleware(next http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        start := time.Now()
-        
-        // Wrap response writer to capture status code
-        ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
-        
-        // Process request
-        next.ServeHTTP(ww, r)
-        
-        // Log the request
-        duration := time.Since(start)
-        
-        userID := "anonymous"
-        if ctxUserID := r.Context().Value("userID"); ctxUserID != nil {
-            if id, ok := ctxUserID.(string); ok {
-                userID = id
-            }
-        }
-        
-        cfg.Logger.RequestInfo(
-            r.Method,
-            r.URL.Path,
-            r.RemoteAddr,
-            ww.Status(),
-            duration,
-            userID,
-        )
-    })
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
+		// Wrap response writer to capture status code
+		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
+
+		// Process request
+		next.ServeHTTP(ww, r)
+
+		// Log the request
+		duration := time.Since(start)
+
+		userID := "anonymous"
+		if ctxUserID := r.Context().Value("userID"); ctxUserID != nil {
+			if id, ok := ctxUserID.(string); ok {
+				userID = id
+			}
+		}
+
+		cfg.Logger.RequestInfo(
+			r.Method,
+			r.URL.Path,
+			r.RemoteAddr,
+			ww.Status(),
+			duration,
+			userID,
+		)
+	})
 }

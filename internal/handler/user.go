@@ -18,7 +18,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
 		return
 	}
-	
+
 	if req.Email == "" || req.PasswordHash == "" || req.FirstName == "" {
 		h.cfg.Logger.Error("first_name, email and password are required")
 		http.Error(w, "first_name, email and password are required", http.StatusBadRequest)
@@ -33,7 +33,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 
 	user := models.RegisterUser{
 		FirstName:    req.FirstName,
-		LastName:   req.LastName,
+		LastName:     req.LastName,
 		Email:        req.Email,
 		PasswordHash: pwHash,
 	}
@@ -51,7 +51,6 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	var req models.LoginUser
 	var usr models.LoginUser
@@ -68,16 +67,16 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error: Database connection failed during login attempt.", http.StatusInternalServerError)
 		return
 	}
-	
+
 	CheckPassword := helper.CheckPasswordHash(req.PasswordHash, usr.PasswordHash)
-	
+
 	if !CheckPassword {
 		h.cfg.Logger.Error("Password do not match")
 		http.Error(w, "Passwords do not match.", http.StatusBadRequest)
 		return
 	}
-	
-	token, err := helper.CreateToken(usr.ID, usr.Role)
+
+	token, err := helper.CreateToken(usr.ID, usr.Role, h.cfg.JwtSecret)
 	if err != nil {
 		h.cfg.Logger.Error("Error occurred while creating token", "Error", err)
 		http.Error(w, "Error occurred while creating token", http.StatusInternalServerError)
@@ -90,7 +89,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *Handler) Me (w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Me(w http.ResponseWriter, r *http.Request) {
 	userVal := r.Context().Value("userID")
 	if userVal == nil {
 		h.cfg.Logger.Error("Failed to generate a response", "Error", "User is not in the context")
@@ -112,11 +111,9 @@ func (h *Handler) Me (w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-
-	if err := helper.WriteJSON(w, map[string]any {"user": userDetails}, http.StatusCreated); err != nil {
+	if err := helper.WriteJSON(w, map[string]any{"user": userDetails}, http.StatusCreated); err != nil {
 		h.cfg.Logger.Error("Failed to generate a response", "Error", err)
 		http.Error(w, "Failed to generate a response", http.StatusInternalServerError)
+		return
 	}
-
 }

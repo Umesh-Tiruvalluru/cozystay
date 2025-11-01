@@ -1,15 +1,21 @@
 services:
-  # client:
-  #   container_name: cozystay-client
-  #   build: ./frontend
-  #   ports:
-  #     - 3000:3000
+  frontend:
+    container_name: cozystay-frontend
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    ports:
+      - 3000:3000
   api:
     container_name: cozystay-api
-    build: .
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     ports:
       - 4000:4000
     env_file: ./.env
+    environment:
+      - DOCKER_ENV=true
     depends_on:
       database:
         condition: service_healthy
@@ -27,20 +33,16 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
     ports:
       - 5432:5432
   migrations:
     image: kukymbr/goose-docker:3.24.2
-    restart: no
+    restart: "no"
     volumes:
       - ./migrations:/migrations
-    depends_on:
-      database:
-        condition: service_healthy
     environment:
       - GOOSE_DRIVER=postgres
-      - GOOSE_DBSTRING=host=cozystay-db port=5432 user=${DB_USER} password=${DB_PASSWORD} dbname=${DB_NAME} sslmode=disable
+      - GOOSE_DBSTRING=postgresql://neondb_owner:npg_Gb4Szuvrip2a@ep-hidden-tooth-adqra3kc.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
       - GOOSE_VERBOSE=true
     command: ["goose", "-dir", "/migrations", "up"]
 

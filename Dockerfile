@@ -1,6 +1,6 @@
-FROM golang:1.24-bookworm AS base
+FROM golang:1.24-bookworm AS builder
 
-WORKDIR /app
+WORKDIR /build
 
 COPY go.mod go.sum ./
 
@@ -8,8 +8,14 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o cozystay ./cmd/api
+RUN CGO_ENABLED=0 go build -o cozystay ./cmd/api
+
+FROM scratch AS production
+
+WORKDIR /prod
+
+COPY --from=builder /build/cozystay ./
 
 EXPOSE 4000
 
-CMD [ "/app/cozystay" ]
+CMD [ "/prod/cozystay" ]

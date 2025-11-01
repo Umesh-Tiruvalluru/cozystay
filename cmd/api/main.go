@@ -9,9 +9,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/joho/godotenv"
+
 	"github.com/Umesh-Tiruvalluru/BookBnb/internal/config"
 	"github.com/Umesh-Tiruvalluru/BookBnb/internal/logger"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -22,23 +23,31 @@ var (
 
 func main() {
 	cfg.Logger = logger.NewAppLogger(cfg.Env)
-	
-	err := godotenv.Load()
-	if err != nil {
-		cfg.Logger.Fatal("Failed to load environmental variables", "error", err)
+
+	if os.Getenv("DOCKER_ENV") == "" {
+		err := godotenv.Load()
+		if err != nil {
+			cfg.Logger.Fatal("Failed to load environmental variables", "error", err)
+		}
 	}
 
 	cfg.Port = os.Getenv("PORT")
 	cfg.Env = os.Getenv("ENV")
+	cfg.JwtSecret = os.Getenv("JWT_SECRET")
+	cfg.DB.Dsn = os.Getenv("DSN")
 
-	dbHost := os.Getenv("DB_HOST")  
-	dbPort := os.Getenv("DB_PORT")  
-	dbUser := os.Getenv("DB_USER")  
-	dbPassword := os.Getenv("DB_PASSWORD")  
-	dbName := os.Getenv("DB_NAME")  
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
 
-	cfg.DB.Dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-    dbHost, dbPort, dbUser, dbPassword, dbName)
+	fmt.Println(cfg.DB.Dsn)
+
+	if cfg.DB.Dsn == "" {
+		cfg.DB.Dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+			dbHost, dbPort, dbUser, dbPassword, dbName)
+	}
 
 	maxIdleConns, err := strconv.Atoi(os.Getenv("MAX_IDLE_CONNS"))
 	if err != nil {
@@ -50,7 +59,7 @@ func main() {
 	if err != nil {
 		cfg.Logger.Error("Error converting string to int", "Error", err)
 	}
-	cfg.DB.MaxOpenConns =  maxOpenConns
+	cfg.DB.MaxOpenConns = maxOpenConns
 
 	db, err = ConnectDB()
 	if err != nil {
@@ -65,9 +74,9 @@ func main() {
 	}
 
 	cfg.Logger.Info("Application starting...",
-        "env", cfg.Env,
-        "port", cfg.Port,
-        "version", "1.0.0",
+		"env", cfg.Env,
+		"port", cfg.Port,
+		"version", "1.0.0",
 	)
 
 	if err := srv.ListenAndServe(); err != nil {

@@ -13,5 +13,6 @@ type Config struct {
 		MaxIdleConns int
 		MaxIdleTime  string
 	}
-	Logger 		*logger.AppLogger
+	Logger    *logger.AppLogger
+	JwtSecret string
 }

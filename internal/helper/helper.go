@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"os"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -34,8 +33,7 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func CreateToken(id uuid.UUID, role string) (string, error) {
-	jwtSecret := os.Getenv("JWT_SECRET")
+func CreateToken(id uuid.UUID, role string, jwtSecret string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"id":   id,
@@ -50,16 +48,16 @@ func CreateToken(id uuid.UUID, role string) (string, error) {
 	return tokenString, nil
 }
 
-func VerifyToken(tokenString string) (map[string]any, error) {
+func VerifyToken(tokenString string, jwtSecret string) (map[string]any, error) {
 	token, err := jwt.Parse(
 		tokenString,
 		func(t *jwt.Token) (any, error) {
-			return []byte("simba"), nil
+			return []byte(jwtSecret), nil
 		},
 		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}),
 	)
 	if err != nil {
-		return nil, errors.New("Invalid Token")
+		return nil, err
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
