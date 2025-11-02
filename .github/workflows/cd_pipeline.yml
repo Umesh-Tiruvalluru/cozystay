@@ -2,63 +2,28 @@ name: CD Deploy to Ec2
 on:
   workflow_run:
     workflows: ["CI Build and Push"]
-    types: [completed]
-
-permissions:
-  contents: read
-  packages: read
-
+    types:
+      - completed
+    branches:
+      - main
 jobs:
-  deploy:
-    # Use self-hosted only if your EC2 instance is registered as a runner.
+  build:
     runs-on: self-hosted
-
-    # Only run when the upstream workflow finished successfully
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout the code
         uses: actions/checkout@v3
-        with:
-          # set this if you need full history for some reason
-          fetch-depth: 0
 
-      - name: Login to GitHub Container Registry (GHCR)
-        env:
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "${GHCR_TOKEN}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-
-      - name: Create .env for docker-compose
-        # ensure this runs where your docker-compose.yml lives; change path if needed
-        working-directory: ./cozystay
+      - name: Deploy to Ec2
         env:
           DSN: ${{ secrets.DSN }}
           BACKEND_TAG: ${{ github.sha }}
           FRONTEND_TAG: ${{ github.sha }}
         run: |
-          # Do NOT echo secrets. Create a clean .env without leading spaces.
-          cat > .env <<EOF
-          DSN=${DSN}
-          BACKEND_TAG=${BACKEND_TAG}
-          FRONTEND_TAG=${FRONTEND_TAG}
-          EOF
-          # optional: show a masked confirmation (no secret value)
-          echo ".env created (contents masked)"
-
-      - name: Pull images and update containers
-        working-directory: ./cozystay
-        run: |
-          # Pull images referenced in docker-compose (will use .env substitutions)
+          cd ../cozystay/
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           docker compose pull
-          # Recreate services; remove orphans if compose changed.
-          docker compose up -d --force-recreate --remove-orphans
-          # Optional: remove dangling images only
+          docker compose up -d --force-recreate
           docker image prune -f
-
-      - name: Verify deployment
-        working-directory: ./cozystay
-        run: |
-          # lightweight health check (customize)
-          docker compose ps
-          echo "Deployment step finished"
+          echo "Deployment completed"
