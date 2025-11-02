@@ -32,7 +32,7 @@ jobs:
           ls -la | grep docker-compose || echo "No docker-compose files here"
 
           echo -e "\n--- Moving to deployment directory ---"
-          cd ../cozystay/
+          cd /home/ec2-user/cozystay/
           pwd
 
           echo -e "\n--- Files in cozystay directory ---"
