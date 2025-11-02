@@ -17,28 +17,18 @@ jobs:
 
       - name: Deploy to Ec2
         env:
-          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          HOST: ${{ secrets.EC2_HOST }}
-          USER: ${{ secrets.EC2_USER }}
           DSN: ${{ secrets.DSN }}
           BACKEND_TAG: ${{ github.sha }}
           FRONTEND_TAG: ${{ github.sha }}
         run: |
-          echo "$PRIVATE_KEY" > private_key.pem
-          chmod 600 private_key.pem
-          ssh -o StrictHostKeyChecking=no -i ./private_key.pem ${USER}@${HOST} << 'ENDSSH'
-            cd ./cozystay
-            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            cat > .env << 'EOF'
-              DSN=${{ secrets.DSN }}
-              BACKEND_TAG=${{ github.sha }}
-              FRONTEND_TAG=${{ github.sha }}
-            EOF
-            docker compose pull
-            docker compose up -d --force-recreate
-            docker image prune -f
-            echo "Deployment completed"
-          ENDSSH
-
-          rm -f private_key.pem
-          echo "SSH Key cleaned up"
+          cd ./cozystay
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          cat > .env << 'EOF'
+            DSN=${{ secrets.DSN }}
+            BACKEND_TAG=${{ github.sha }}
+            FRONTEND_TAG=${{ github.sha }}
+          EOF
+          docker compose pull
+          docker compose up -d --force-recreate
+          docker image prune -f
+          echo "Deployment completed"
