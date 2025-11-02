@@ -12,9 +12,6 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Checkout the code
-        uses: actions/checkout@v3
-
       - name: Deploy to Ec2
         env:
           DSN: ${{ secrets.DSN }}
@@ -23,6 +20,9 @@ jobs:
         run: |
           cd ../cozystay/
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+          docker compose down --remove-orphans
+
           cat > .env << 'EOF'
             DSN=${{ secrets.DSN }}
             BACKEND_TAG=${{ github.sha }}
