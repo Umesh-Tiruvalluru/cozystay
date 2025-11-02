@@ -1,7 +1,7 @@
 name: CD Deploy to Ec2
 on:
   workflow_run:
-    workflows: ["CI Backend", "CI Frontend"]
+    workflows: ["CI Build and Push"]
     types:
       - completed
     branches:
@@ -26,22 +26,19 @@ jobs:
         run: |
           echo "$PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
-
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER}@${HOST} << 'ENDSSH'
+            cd ./cozystay
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            cat > .env << 'EOF'
+              DSN=${{ secrets.DSN }}
+              BACKEND_TAG=${{ github.sha }}
+              FRONTEND_TAG=${{ github.sha }}
+            EOF
+            docker compose pull
+            docker compose up -d --force-recreate
+            docker image prune -f
+            echo "Deployment completed"
+          ENDSSH
 
-          cd ./cozystay
-
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-          cat > .env << EOF
-          DSN=${{ secrets.DSN }}
-          BACKEND_TAG=${{ github.sha }}
-          FRONTEND_TAG=${{ github.sha }}
-          EOF
-
-          docker compose pull
-
-          docker compose up -d --force-recreate
-
-          docker image prune -f
-          echo "Deployment completed" ENDSSH
+          rm -f private_key.pem
+          echo "SSH Key cleaned up"
