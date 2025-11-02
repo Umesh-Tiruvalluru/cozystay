@@ -42,5 +42,6 @@ jobs:
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
+          build-args: NEXT_PUBLIC_API_URL={{ secrets.API_URL }}
           push: true
           tags: ghcr.io/umesh-tiruvalluru/cozystay-frontend:${{ github.sha }}
