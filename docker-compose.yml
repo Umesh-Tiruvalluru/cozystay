@@ -11,11 +11,11 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    environment:
+      DOCKER_ENV: true
     ports:
       - 4000:4000
     env_file: ./.env
-    environment:
-      - DOCKER_ENV=true
     depends_on:
       database:
         condition: service_healthy
@@ -42,7 +42,7 @@ services:
       - ./migrations:/migrations
     environment:
       - GOOSE_DRIVER=postgres
-      - GOOSE_DBSTRING=postgresql://neondb_owner:npg_Gb4Szuvrip2a@ep-hidden-tooth-adqra3kc.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+      - GOOSE_DBSTRING=${DSN}
       - GOOSE_VERBOSE=true
     command: ["goose", "-dir", "/migrations", "up"]
 

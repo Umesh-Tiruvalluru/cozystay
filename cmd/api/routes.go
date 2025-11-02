@@ -10,53 +10,72 @@ import (
 )
 
 func routes() http.Handler {
-	// mux := chi.NewRouter()
-	v1Router := chi.NewRouter()
-	repo := repository.NewRepositoryUser(db)
-	h := handler.NewHandler(&cfg, repo)
+	r := chi.NewRouter()
 
-	v1Router.Use(LoggingMiddleware)
-
-	v1Router.Use(cors.Handler(cors.Options{
+	r.Use(LoggingMiddleware)
+	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://*", "https://*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
+		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodPatch, http.MethodOptions},
 		AllowedHeaders:   []string{"*"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
 
-	v1Router.Get("/healthzz", h.Healthz)
-	// v1Router.With(AuthMiddleware).Get("/testing", h.Testing)
+	repo := repository.NewRepositoryUser(db)
+	h := handler.NewHandler(&cfg, repo)
 
-	// auth
-	v1Router.Post("/auth/login", h.Login)
-	v1Router.Post("/auth/register", h.Register)
-	v1Router.With(AuthMiddleware).Get("/auth/me", h.Me)
+	api := chi.NewRouter()
 
-	//Properties :
-	v1Router.Get("/properties", h.GetAllProperties)
-	v1Router.Get("/properties/{id}", h.GetPropertyByID)
-	v1Router.With(AuthMiddleware, RoleMiddleware).Post("/properties", h.PostProperty)
-	v1Router.With(AuthMiddleware, RoleMiddleware).Delete("/properties/{id}", h.DeleteProperty)
-	v1Router.With(AuthMiddleware, RoleMiddleware).Put("/properties", h.UpdateProperty)
-	v1Router.Get("/properties/{id}/availability", h.SearchAvailability)
+	// --- Auth routes ---
+	api.Route("/auth", func(r chi.Router) {
+		r.Post("/login", h.Login)
+		r.Post("/register", h.Register)
+		// protected route returning current user
+		r.With(AuthMiddleware).Get("/me", h.Me)
+	})
 
-	//property image
-	v1Router.With(AuthMiddleware, RoleMiddleware).Post("/property/image/{id}", h.PostImage)
-	v1Router.With(AuthMiddleware, RoleMiddleware).Delete("/property/image/{id}", h.DeletePropertyImage)
+	// --- Properties ---
+	api.Route("/properties", func(r chi.Router) {
+		// public
+		r.Get("/", h.GetAllProperties)
+		r.Get("/{id}", h.GetPropertyByID)
+		r.Get("/{id}/availability", h.SearchAvailability)
 
-	//Amenity:
-	v1Router.With(AuthMiddleware, RoleMiddleware).Post("/amenities", h.AddAmenity)
-	v1Router.With(AuthMiddleware, RoleMiddleware).Get("/amenities", h.GetAmenities)
-	v1Router.With(AuthMiddleware, RoleMiddleware).Post("/properties/{id}/amenities", h.PostPropertyAmenities)
-	// v1Router.With(AuthMiddleware, RoleMiddleware).Delete("/amenities", )
+		// protected: only users with appropriate role (e.g. host/admin)
+		r.With(AuthMiddleware, RoleMiddleware).Post("/", h.PostProperty)
+		r.With(AuthMiddleware, RoleMiddleware).Put("/{id}", h.UpdateProperty)
+		r.With(AuthMiddleware, RoleMiddleware).Delete("/{id}", h.DeleteProperty)
 
-	//Bookings
-	v1Router.With(AuthMiddleware).Get("/bookings", h.GetBookings)
-	v1Router.With(AuthMiddleware).Post("/bookings", h.CreateBooking)
-	v1Router.With(AuthMiddleware).Get("/bookings/{id}", h.GetBookingByID)
-	v1Router.With(AuthMiddleware).Patch("/bookings/{id}", h.CancelBooking)
+		// property images
+		r.With(AuthMiddleware, RoleMiddleware).Post("/{id}/images", h.PostImage)
+		r.With(AuthMiddleware, RoleMiddleware).Delete("/{id}/images/{imageID}", h.DeletePropertyImage)
+	})
 
-	return v1Router
+	// --- Amenities ---
+	api.Route("/amenities", func(r chi.Router) {
+		// anyone can list amenities
+		r.Get("/", h.GetAmenities)
+		// only admins/hosts can create or attach
+		r.With(AuthMiddleware, RoleMiddleware).Post("/", h.AddAmenity)
+		r.With(AuthMiddleware, RoleMiddleware).Post("/{propertyID}", h.PostPropertyAmenities)
+	})
+
+	// --- Bookings ---
+	api.Route("/bookings", func(r chi.Router) {
+		// user must be authenticated to access bookings
+		r.With(AuthMiddleware).Get("/", h.GetBookings)
+		r.With(AuthMiddleware).Post("/", h.CreateBooking)
+		r.With(AuthMiddleware).Get("/{id}", h.GetBookingByID)
+		// partial update for status changes (cancel, check-in, etc.)
+		r.With(AuthMiddleware).Patch("/{id}", h.CancelBooking)
+	})
+
+	// health check
+	api.Get("/healthz", h.Healthz)
+
+	// mount versioned API
+	r.Mount("/api/v1", api)
+
+	return r
 }

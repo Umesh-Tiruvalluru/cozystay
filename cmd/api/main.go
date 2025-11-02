@@ -42,8 +42,6 @@ func main() {
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
 
-	fmt.Println(cfg.DB.Dsn)
-
 	if cfg.DB.Dsn == "" {
 		cfg.DB.Dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 			dbHost, dbPort, dbUser, dbPassword, dbName)
@@ -106,8 +104,6 @@ func ConnectDB() (*sql.DB, error) {
 	if err = db.PingContext(ctx); err != nil {
 		return nil, err
 	}
-
-	fmt.Println("DB connected successfully")
 
 	return db, nil
 }
