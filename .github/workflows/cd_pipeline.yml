@@ -6,64 +6,31 @@ on:
       - completed
     branches:
       - main
-
 jobs:
-  deploy:
+  build:
     runs-on: self-hosted
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    steps:
-      - name: Checkout the code
-        uses: actions/checkout@v3
 
-      - name: Debug and Deploy
+    steps:
+      - name: Deploy to Ec2
         env:
           DSN: ${{ secrets.DSN }}
           BACKEND_TAG: ${{ github.sha }}
           FRONTEND_TAG: ${{ github.sha }}
         run: |
-          echo "========== DEBUG INFO =========="
-          echo "Current directory:"
-          pwd
-
-          echo -e "\n--- Files in current directory ---"
-          ls -la
-
-          echo -e "\n--- Checking for docker-compose files ---"
-          ls -la | grep docker-compose || echo "No docker-compose files here"
-
-          echo -e "\n--- Moving to deployment directory ---"
           cd /home/ec2-user/cozystay/
-          pwd
-
-          echo -e "\n--- Files in cozystay directory ---"
-          ls -la
-
-          echo -e "\n--- docker-compose.yml content ---"
-          cat docker-compose.yml
-
-          echo -e "\n--- Checking for override files ---"
-          ls -la | grep docker-compose
-
-          echo -e "\n--- What Docker Compose will use ---"
-          docker compose config --services
-
-          echo -e "\n========== STARTING DEPLOYMENT =========="
-
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
           docker compose down --remove-orphans
 
           cat > .env << 'EOF'
-          DSN=${{ secrets.DSN }}
-          BACKEND_TAG=${{ github.sha }}
-          FRONTEND_TAG=${{ github.sha }}
+            DSN='${{ secrets.DSN }}'
+            BACKEND_TAG=${{ github.sha }}
+            FRONTEND_TAG=${{ github.sha }}
           EOF
 
-          echo -e "\n--- .env file created ---"
-          cat .env
-
+          source .env
           docker compose pull
-          docker compose up -d --force-recreate --remove-orphans
+          docker compose up -d --force-recreate
           docker image prune -f
-
           echo "Deployment completed"
