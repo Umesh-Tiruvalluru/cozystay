@@ -44,5 +44,4 @@ jobs:
           docker compose up -d --force-recreate
 
           docker image prune -f
-          echo "Deployment completed"
-          Exit
+          echo "Deployment completed" ENDSSH
