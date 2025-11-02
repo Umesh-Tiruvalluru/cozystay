@@ -28,6 +28,8 @@ jobs:
             BACKEND_TAG=${{ github.sha }}
             FRONTEND_TAG=${{ github.sha }}
           EOF
+
+          echo $DSN
           docker compose pull
           docker compose up -d --force-recreate
           docker image prune -f

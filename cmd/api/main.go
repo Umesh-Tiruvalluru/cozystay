@@ -34,9 +34,9 @@ func main() {
 	cfg.Port = os.Getenv("PORT")
 	cfg.Env = os.Getenv("ENV")
 	cfg.JwtSecret = os.Getenv("JWT_SECRET")
+	dbHost := os.Getenv("DB_HOST")
 	cfg.DB.Dsn = os.Getenv("DSN")
 
-	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
