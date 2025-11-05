@@ -7,11 +7,16 @@ import { AuthProvider } from "@/lib/auth-context";
 import { Navbar } from "@/components/navbar";
 
 const figtree = Figtree({ subsets: ["latin"], display: "swap" });
-const montserrat = Montserrat({ subsets: ["latin"], display: "swap", variable: "--font-heading" });
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-heading",
+});
 
 export const metadata: Metadata = {
-  title: "BookBnb — Find extraordinary stays",
-  description: "Discover and book unique properties around the world with BookBnb.",
+  title: "CozyStay — Find extraordinary stays",
+  description:
+    "Discover and book unique properties around the world with CozyStay.",
 };
 
 export default function RootLayout({
@@ -27,7 +32,9 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={`${figtree.className} ${montserrat.variable} antialiased`}>
+      <body
+        className={`${figtree.className} ${montserrat.variable} antialiased`}
+      >
         <AuthProvider>
           <Navbar />
           {children}

@@ -33,8 +33,15 @@ export default function AdminPage() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<Record<string, any>>({});
-  const [imageInputs, setImageInputs] = useState<Record<string, { image_url: string; caption: string; display_order: string }>>({});
-  const [selectedAmenityIds, setSelectedAmenityIds] = useState<Record<string, Set<string>>>({});
+  const [imageInputs, setImageInputs] = useState<
+    Record<
+      string,
+      { image_url: string; caption: string; display_order: string }
+    >
+  >({});
+  const [selectedAmenityIds, setSelectedAmenityIds] = useState<
+    Record<string, Set<string>>
+  >({});
 
   useEffect(() => {
     if (!authLoading && (!isAuthenticated || user?.role !== "admin")) {
@@ -43,7 +50,9 @@ export default function AdminPage() {
     }
 
     if (isAuthenticated && user?.role === "admin") {
-      Promise.all([loadProperties(), loadAmenities()]).finally(() => setIsLoading(false));
+      Promise.all([loadProperties(), loadAmenities()]).finally(() =>
+        setIsLoading(false),
+      );
     }
   }, [isAuthenticated, authLoading, user]);
 
@@ -66,7 +75,7 @@ export default function AdminPage() {
   };
 
   const handleFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -127,7 +136,7 @@ export default function AdminPage() {
   };
 
   const handleEditChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setEditData((prev) => ({ ...prev, [name]: value }));
@@ -158,7 +167,7 @@ export default function AdminPage() {
 
   const handleImageInputChange = (
     propertyId: string,
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const { name, value } = e.target;
     setImageInputs((prev) => ({
@@ -187,7 +196,10 @@ export default function AdminPage() {
           display_order: Number.parseInt(values.display_order || "0"),
         },
       ]);
-      setImageInputs((prev) => ({ ...prev, [propertyId]: { image_url: "", caption: "", display_order: "" } }));
+      setImageInputs((prev) => ({
+        ...prev,
+        [propertyId]: { image_url: "", caption: "", display_order: "" },
+      }));
     } catch (error) {
       console.error("Failed to add image:", error);
     }
@@ -234,6 +246,8 @@ export default function AdminPage() {
       </div>
     );
   }
+
+  console.log(properties);
 
   return (
     <div className="min-h-screen bg-background">
@@ -318,8 +332,12 @@ export default function AdminPage() {
                 <CardContent className="pt-6 space-y-4">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{property.title}</h3>
-                      <p className="text-sm text-muted-foreground">{property.location}</p>
+                      <h3 className="font-semibold text-lg">
+                        {property.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {property.location}
+                      </p>
                       <div className="flex gap-4 mt-2 text-sm">
                         {property.price_per_night != null && (
                           <span>${property.price_per_night}/night</span>
@@ -332,13 +350,27 @@ export default function AdminPage() {
                     <div className="flex gap-2">
                       {editingId === property.id ? (
                         <>
-                          <Button variant="secondary" onClick={saveEdit}>Save</Button>
-                          <Button variant="ghost" onClick={cancelEdit}>Cancel</Button>
+                          <Button variant="secondary" onClick={saveEdit}>
+                            Save
+                          </Button>
+                          <Button variant="ghost" onClick={cancelEdit}>
+                            Cancel
+                          </Button>
                         </>
                       ) : (
                         <>
-                          <Button variant="secondary" onClick={() => startEdit(property)}>Edit</Button>
-                          <Button variant="destructive" onClick={() => handleDelete(property.id)}>Delete</Button>
+                          <Button
+                            variant="secondary"
+                            onClick={() => startEdit(property)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            onClick={() => handleDelete(property.id)}
+                          >
+                            Delete
+                          </Button>
                         </>
                       )}
                     </div>
@@ -346,12 +378,40 @@ export default function AdminPage() {
 
                   {editingId === property.id && (
                     <div className="space-y-3">
-                      <Input name="title" value={editData.title ?? ""} onChange={handleEditChange} placeholder="Title" />
-                      <Textarea name="description" value={editData.description ?? ""} onChange={handleEditChange} placeholder="Description" />
-                      <Input name="location" value={editData.location ?? ""} onChange={handleEditChange} placeholder="Location" />
+                      <Input
+                        name="title"
+                        value={editData.title ?? ""}
+                        onChange={handleEditChange}
+                        placeholder="Title"
+                      />
+                      <Textarea
+                        name="description"
+                        value={editData.description ?? ""}
+                        onChange={handleEditChange}
+                        placeholder="Description"
+                      />
+                      <Input
+                        name="location"
+                        value={editData.location ?? ""}
+                        onChange={handleEditChange}
+                        placeholder="Location"
+                      />
                       <div className="grid grid-cols-2 gap-3">
-                        <Input name="price_per_night" type="number" step="0.01" value={editData.price_per_night ?? ""} onChange={handleEditChange} placeholder="Price per Night" />
-                        <Input name="max_guests" type="number" value={editData.max_guests ?? ""} onChange={handleEditChange} placeholder="Max Guests" />
+                        <Input
+                          name="price_per_night"
+                          type="number"
+                          step="0.01"
+                          value={editData.price_per_night ?? ""}
+                          onChange={handleEditChange}
+                          placeholder="Price per Night"
+                        />
+                        <Input
+                          name="max_guests"
+                          type="number"
+                          value={editData.max_guests ?? ""}
+                          onChange={handleEditChange}
+                          placeholder="Max Guests"
+                        />
                       </div>
                     </div>
                   )}
@@ -380,7 +440,9 @@ export default function AdminPage() {
                       />
                     </div>
                     <div>
-                      <Button size="sm" onClick={() => addImage(property.id)}>Add Image</Button>
+                      <Button size="sm" onClick={() => addImage(property.id)}>
+                        Add Image
+                      </Button>
                     </div>
                   </div>
 
@@ -388,14 +450,21 @@ export default function AdminPage() {
                     <h4 className="font-medium">Assign Amenities</h4>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-40 overflow-auto pr-2">
                       {amenities.map((a) => {
-                        const checked = selectedAmenityIds[property.id]?.has(a.amenity_id) ?? false;
+                        const checked =
+                          selectedAmenityIds[property.id]?.has(a.amenity_id) ??
+                          false;
                         return (
-                          <label key={a.amenity_id} className="flex items-center gap-2 text-sm">
+                          <label
+                            key={a.amenity_id}
+                            className="flex items-center gap-2 text-sm"
+                          >
                             <input
                               type="checkbox"
                               className="accent-primary"
                               checked={checked}
-                              onChange={() => toggleAmenitySelected(property.id, a.amenity_id)}
+                              onChange={() =>
+                                toggleAmenitySelected(property.id, a.amenity_id)
+                              }
                             />
                             <span>{a.name}</span>
                           </label>
@@ -403,7 +472,12 @@ export default function AdminPage() {
                       })}
                     </div>
                     <div>
-                      <Button size="sm" onClick={() => addAmenitiesToProperty(property.id)}>Add Selected Amenities</Button>
+                      <Button
+                        size="sm"
+                        onClick={() => addAmenitiesToProperty(property.id)}
+                      >
+                        Add Selected Amenities
+                      </Button>
                     </div>
                   </div>
                 </CardContent>

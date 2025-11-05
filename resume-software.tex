@@ -1,0 +1,225 @@
+%-------------------------
+% Resume in Latex
+% Author : Jake Gutierrez
+% Based off of: https://github.com/sb2nov/resume
+% License : MIT
+%------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[pdfusetitle,hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{polyglossia}
+\setdefaultlanguage{english}
+\usepackage{cfr-lm}
+\usepackage[T1]{fontenc}
+
+\usepackage{fontawesome5}   % for icons
+\usepackage{ifthen}     
+
+%----------FONT OPTIONS----------
+% Font options
+\newcommand{\headerfontiii}{\fontfamily{ppl}\selectfont} % Palatino (elegant serif)
+
+\definecolor{zinc600}{RGB}{82,82,91}
+\definecolor{darkblue}{RGB}{0,0,139}
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & \\[2pt]
+      \footnotesize#2 & \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumePOR}[3]{
+\vspace{0.5mm}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+        \textbf{#1}\hspace{0.3mm}#2 & \textit{\small{#3}} 
+    \end{tabular*}
+    \vspace{-2mm}
+}
+
+\newcommand{\resumeSubItem}[2]{\resumeItem{\textbf{#1}: #2}\vspace{-4pt}}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+% Global list spacing and margins (flush-left bullets)
+\setlist[itemize]{leftmargin=0pt,labelsep=0.6em,itemindent=0pt,labelindent=0pt}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0pt, label={}]} 
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}[leftmargin=0pt, label={}, itemsep=0.5mm]}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+\newcommand{\resumeHeadingSkillStart}{\begin{itemize}[leftmargin=0pt, label={}, itemsep=1.7mm]}
+\newcommand{\resumeHeadingSkillEnd}{\end{itemize}}
+
+% Fix external-link icons in \href
+\let\hrefWithoutArrow\href
+\renewcommand{\href}[2]{\hrefWithoutArrow{#1}{#2 \raisebox{.15ex}{\footnotesize \faExternalLink*}}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\headerfontiii
+
+%----------HEADING----------
+\begin{center}
+    {\Huge\textbf{UMESH TIRUVALLURU}}
+    \vspace{2.5 mm} \\
+    {\Large \textmd{Software Development Engineer}} 
+    \vspace{2 mm} \\
+    \normalsize
+    \mbox{{\footnotesize\faMapMarker*}\hspace*{0.13cm}Nellore, Andhra Pradesh} \kern 0.5cm
+    \mbox{\hrefWithoutArrow{mailto:tiruvalluruumesh@gmail.com}{{\footnotesize\faEnvelope[regular]}\hspace*{0.13cm}tiruvalluruumesh@gmail.com}} \kern 0.5cm
+    \mbox{\hrefWithoutArrow{tel:+91-834-186-48-14}{{\footnotesize\faPhone*}\hspace*{0.13cm}+91 83418 64814}} \kern 0.5cm
+    \mbox{\hrefWithoutArrow{https://www.umesh.tech/}{{\footnotesize\faLink}\hspace*{0.13cm}umesh.tech}} \kern 0.5cm
+    \vspace{2 mm}
+    \mbox{\hrefWithoutArrow{https://linkedin.com/in/umeshTiruvalluru}{{\footnotesize\faLinkedinIn}\hspace*{0.13cm}umeshTiruvalluru}} \kern 0.5cm
+    \mbox{\hrefWithoutArrow{https://github.com/Umesh-Tiruvalluru}{{\footnotesize\faGithub}\hspace*{0.13cm}Umesh-Tiruvalluru}}
+\end{center}
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+\resumeSubHeadingListStart
+  \resumeSubheading
+      {Kinfocloud Tech Solution}{Bangalore, India}
+      {Full Stack Developer Intern}{August 2024 - November 2024}
+      \resumeItemListStart
+        \resumeItem{Resolved 15+ critical production issues on client-facing web applications. Reduced page load times by 30\% and improved user experience.}
+        \resumeItem{Built RESTful APIs using Node.js and MongoDB with authentication and data validation. Handled 1000+ daily API requests.}
+        \resumeItem{Performed code reviews and implemented best practices. Used Git/GitHub for version control to improve code quality.}
+        \resumeItem{Worked in Agile environment. Participated in sprint planning, daily standups, and retrospectives to deliver features on time.}
+      \resumeItemListEnd 
+\resumeSubHeadingListEnd
+
+%-----------EDUCATION-----------
+\section{Education}
+\resumeSubHeadingListStart
+  \resumeSubheading
+    {Geethanjal Institute of Science and Technology}{Nellore, India}
+    {Bachelor of Technology in Electronics and Communication}{July 2019 - August 2023}
+    \resumeItemListStart
+      \resumeItem{CGPA: 7.07/10.00}
+    \resumeItemListEnd
+  \resumeSubheading
+    {Narayana Jr College}{Nellore, India}
+    {Pre-University Education}{June 2017 -- May 2019}
+    \resumeItemListStart
+      \resumeItem{CGPA: 9.7/10.00}
+    \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+\section{Projects}
+\resumeSubHeadingListStart
+  \resumeProjectHeading
+    {\textbf{CozyStay} $-$ \hrefWithoutArrow{https://linkbrain.onrender.com}{\underline{Demo}} $|$ \hrefWithoutArrow{https://github.com/Umesh-Tiruvalluru/BookBnb}{\underline{Code}} }{Tools: Golang, PostgreSQL, Chi Router, Next.js, TypeScript, Tailwind CSS, Shadcn UI, Docker, JWT, REST API, AWS EC2, GitHub Actions}
+    \resumeItemListStart
+      \resumeItem{Built full-stack property booking platform using Go, Next.js, and TypeScript. Created scalable RESTful APIs with Chi router and JWT authentication for 500+ users.}
+      \resumeItem{Implemented role-based access control (RBAC) with PostgreSQL. Created admin-only endpoints and protected sensitive operations using middleware authentication.}
+      \resumeItem{Optimized Dockerfiles with multi-stage builds for backend and frontend. Reduced image sizes by 45\% and improved startup times by 35\%.}
+      \resumeItem{Set up GitHub Actions CI/CD pipeline for automated builds and AWS EC2 deployment. Reduced manual deployment time by 60\%.}
+      \resumeItem{Developed booking system with dynamic search, real-time availability checks, automated pricing, and cancellation workflows. Processed 200+ bookings.}
+    \resumeItemListEnd
+
+  \resumeProjectHeading
+    {\textbf{Shortify} $-$ \hrefWithoutArrow{https://github.com/Umesh-Tiruvalluru/shortify}{\underline{Code}} }{Tools: Java, Spring Boot, Maven, PostgreSQL, Spring Data JPA, REST API}
+    \resumeItemListStart
+      \resumeItem{Built production-ready URL shortening service using Spring Boot, PostgreSQL, and JPA. Implemented CRUD operations, URL redirection, and analytics for 1000+ URLs.}
+      \resumeItem{Designed scalable database schema with unique short codes, access counters, and timestamps. Used PostgreSQL indexes to ensure data integrity and fast queries.}
+      \resumeItem{Implemented business logic using Spring patterns. Generated Base62 short codes with uniqueness constraints and real-time usage statistics.}
+      \resumeItem{Added input validation with Spring Validation and global exception handling. Improved API reliability by 40\% with better error responses.}
+    \resumeItemListEnd
+
+  \resumeProjectHeading
+    {\textbf{LinkBrain} $-$ \hrefWithoutArrow{https://linkbrain.onrender.com}{\underline{Demo}} $|$ \hrefWithoutArrow{https://github.com/Umesh-Tiruvalluru/LinkBrain}{\underline{Code}} }{Tools: React.js, React Query, Tailwind CSS, TypeScript, Node.js, Express.js, MongoDB, JWT, REST API}
+    \resumeItemListStart
+      \resumeItem{Built full-stack MERN application for organizing resources with user authentication. Grew to 50+ active users managing 500+ bookmarked resources.}
+      \resumeItem{Implemented secure authentication using JWT tokens. Protected user actions and API endpoints with proper authorization.}
+      \resumeItem{Added tagging and categorization features for resource management. Improved user organization and searchability by 50\%.}
+      \resumeItem{Optimized database queries using MongoDB aggregation pipelines and React Query caching. Reduced page load time by 25\%.}
+    \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+%-----------SKILLS-----------
+\section{Technical Skills}
+\resumeHeadingSkillStart
+  \resumeSubItem{Programming Languages:}
+    {Java, Python, JavaScript (ES6+), TypeScript, Go, C/C++, SQL}
+  \resumeSubItem{Frameworks \& Libraries:}
+    {React.js, Next.js, Node.js, Express.js, Spring Boot, Tailwind CSS, JWT}
+  \resumeSubItem{Database Systems:}
+    {PostgreSQL, MongoDB, Redis, Database Design, Query Optimization}
+  \resumeSubItem{Cloud \& DevOps:}
+    {AWS (EC2, S3), Docker, CI/CD, GitHub Actions, Git, Version Control}
+  \resumeSubItem{Testing \& Tools:}
+    {Postman, API Testing, Figma, VS Code, Linux, Maven}
+  \resumeSubItem{Core Concepts:}
+    {Data Structures, Algorithms, Object-Oriented Programming, RESTful APIs, Microservices, Agile, SDLC}
+\resumeHeadingSkillEnd
+
+%-----------CERTIFICATIONS-----------
+\section{Certifications}
+\resumeSubHeadingListStart
+  \resumePOR{}{\hrefWithoutArrow{https://www.credly.com/badges/415ebbd5-5b29-4661-987a-ac8866d76a17/public_url}{GitHub Foundations -- GitHub}}{}
+  \resumePOR{}{\hrefWithoutArrow{https://media.geeksforgeeks.org/courses/certificates/83b5380337e445779d8bec9df86dc7b4.pdf}{Data Structures \& Algorithms -- GeeksforGeeks}}{}
+  \resumePOR{}{\hrefWithoutArrow{https://drive.google.com/file/d/1zAgdQ--ppQRmWtNPaNEeFzaE2breL1zR/view?usp=sharing}{Frontend Developer (React) -- HackerRank}}{}
+\resumeSubHeadingListEnd
+
+\end{document}

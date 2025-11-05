@@ -404,7 +404,7 @@ func (h *Handler) PostPropertyAmenities(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	propertyIDParam := r.PathValue("id")
+	propertyIDParam := r.PathValue("propertyID")
 	propertyID, err := uuid.Parse(propertyIDParam)
 	if err != nil {
 		http.Error(w, "invalid property id", http.StatusBadRequest)

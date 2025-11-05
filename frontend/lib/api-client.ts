@@ -168,10 +168,12 @@ export const propertiesApi = {
       display_order: number;
     }>,
   ) =>
-    api.post<{ message: string }>(`/property/image/${propertyId}`, { images }),
+    api.post<{ message: string }>(`/properties/${propertyId}/images`, {
+      images,
+    }),
 
-  deleteImage: (imageId: string) =>
-    api.delete<void>(`/property/image/${imageId}`),
+  deleteImage: (imageId: string, id: string) =>
+    api.delete<void>(`/properties/${id}/images/${imageId}`),
 };
 
 // ---------- Bookings API ----------
@@ -197,7 +199,7 @@ export const amenitiesApi = {
   create: (data: { name: string }) => api.post<Amenity>("/amenities", data),
 
   addToProperty: (propertyId: string, amenityIds: string[]) =>
-    api.post<void>(`/properties/${propertyId}/amenities`, {
+    api.post<void>(`/amenities/${propertyId}`, {
       amenity_id: amenityIds,
     }),
 };

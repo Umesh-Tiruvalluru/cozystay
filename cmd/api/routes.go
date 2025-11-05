@@ -44,7 +44,7 @@ func routes() http.Handler {
 
 		// protected: only users with appropriate role (e.g. host/admin)
 		r.With(AuthMiddleware, RoleMiddleware).Post("/", h.PostProperty)
-		r.With(AuthMiddleware, RoleMiddleware).Put("/{id}", h.UpdateProperty)
+		r.With(AuthMiddleware, RoleMiddleware).Put("/", h.UpdateProperty)
 		r.With(AuthMiddleware, RoleMiddleware).Delete("/{id}", h.DeleteProperty)
 
 		// property images

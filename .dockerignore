@@ -1,3 +1,4 @@
 bin
 frontend
 .git
+docker-compose.yml
